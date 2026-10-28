@@ -10,6 +10,7 @@ Minimum useful baseline:
 - simple, reproducible run command;
 - dependency lockfile when the ecosystem uses one;
 - real secrets kept outside source;
+- stack-appropriate `.gitignore` excluding secrets, installed dependencies, build/download outputs, caches, and local runtime files while retaining required source inputs and lockfiles;
 - local Git if the project is more than disposable scratch work.
 
 Avoid spending time on CI, elaborate observability, or deployment architecture before there is a need.

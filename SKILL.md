@@ -23,7 +23,7 @@ The goal is not to teach programming unless asked. The goal is to let the user k
 
 ## 1. Classify the task before acting
 
-Estimate both **system criticality** and **change risk**. Use the higher effective level.
+Estimate both **system criticality** and **change risk**. Select checks for the data, permissions, behavior, and delivery steps actually affected. System criticality raises the assurance needed for affected invariants; it does not require unrelated procedures for an isolated cosmetic edit. If the blast radius is unclear, inspect it before choosing the level.
 
 ### Level 0 — trivial and reversible
 
@@ -87,7 +87,10 @@ For large repositories, start narrow and expand context only when evidence requi
 
 For Level 0, edit directly.
 
+For a new feature or changed behavior, first define success through observable user actions and outcomes. Reuse explicit requirements; otherwise choose conventional safe assumptions and clarify only ambiguities that materially change the product. Keep acceptance criteria short and use them to choose verification, rather than deriving success solely from the implementation.
+
 For Level 1+, form a short internal plan covering:
+- user-visible outcome and acceptance criteria;
 - files/components affected;
 - behavior/invariants that must remain true;
 - tests/checks needed;
@@ -112,7 +115,8 @@ Key rules:
 - Never run destructive Git operations (`reset --hard`, aggressive `clean`, history rewrite, force push) merely to simplify your task.
 - Never push or publish unless the user asked for it or the surrounding workflow clearly authorizes it.
 - If creating a new software project and Git is available, initialize local version control unless the user opted out.
-- Before a broad/risky edit, ensure there is a recoverable checkpoint without disturbing unrelated work.
+- Create or update a stack-appropriate `.gitignore` before staging: exclude secrets, installed dependencies, reproducible build/download outputs, caches, and local runtime files. Preserve required lockfiles and intentionally versioned inputs; ignore rules do not protect files already tracked.
+- Before a broad/risky edit, verify recovery covers the current pre-edit state of affected files, including staged/unstaged edits and required untracked files. A branch alone does not save uncommitted work. Keep secrets out of ordinary commits and patch artifacts.
 
 ## 5. Check backups before destructive persistent-data work
 
@@ -177,6 +181,8 @@ Never silently “fix” a problem by broadly weakening:
 
 Read `references/testing.md` for Level 1+ behavior changes and all bug fixes.
 
+Before tests, seed/reset scripts, or starting the application, inspect invoked scripts/hooks for side effects. For commands that can reach persistent state or external services, resolve the actual targets without printing credentials and use isolated test data and sandbox/test credentials. Do not assume a local command or a variable named `test` makes it safe. If isolation cannot be confirmed, run safe checks and report the limitation instead of running destructive fixtures or live payments/messages.
+
 Use the smallest useful test set. Typical order:
 1. targeted unit/integration test;
 2. relevant typecheck/static analysis;
@@ -193,6 +199,8 @@ For a bug fix, when practical:
 
 Do not edit tests merely to make a broken implementation pass. If intended behavior changes, update tests deliberately and explain the changed contract when material.
 
+When a change spans UI/API/storage or another integration boundary, verify at least one acceptance scenario through the real connected application in a safe environment. For persistence, check a fresh read/reload as appropriate. Mocks and a passing build alone do not establish that the feature works in the application. If unavailable, distinguish implementation, isolated checks, and application verification in the result. Do not require browser automation for every small edit.
+
 ## 9. Treat dependencies as code you inherit
 
 Before adding a dependency:
@@ -204,9 +212,11 @@ Before adding a dependency:
 
 For security-sensitive or production projects, inspect dependency/security warnings using the ecosystem's normal tooling when available. Do not blindly auto-fix major upgrades.
 
-## 10. Deploy conservatively
+## 10. Control external actions and deploy conservatively
 
-Read `references/deployment.md` before production deployment, significant infrastructure changes, or migrations coupled to deploys.
+Read `references/deployment.md` before material external mutations/publication, production deployment, significant infrastructure changes, or migrations coupled to deploys.
+
+Before an external action with material effects, establish the intended account/environment, affected objects or recipients, permitted action, and limits. Honor authorization already given in the conversation or active workflow without asking again. A request to draft does not authorize sending; permission to deploy does not authorize unrelated data changes, subscriptions, or spending beyond the agreed scope. If authorization is missing, prepare the reviewable diff, recipient list, plan, or dry run first and ask only for the missing decision before execution.
 
 Default rules:
 - Do not deploy to production unless requested or clearly authorized by the active workflow.
@@ -216,7 +226,17 @@ Default rules:
 - Run a post-deploy smoke check for material changes.
 - Prefer reversible/staged rollout for Level 3 work.
 
-## 11. Route model/reasoning and context efficiently
+## 11. Control operating costs
+
+Read `references/operating-costs.md` before introducing or materially expanding paid hosting, metered APIs, storage, background work, or publicly reachable expensive operations.
+
+- Identify the billing unit and expected usage/cost, stating assumptions and unknowns.
+- Choose hosting for the project as a whole: favor a simple setup, reuse suitable infrastructure, and justify additional services by concrete benefits. Match CPU/RAM/storage to actual runtime and traffic needs, start with a small reliable configuration, and scale on measurements rather than speculative growth.
+- Work within already authorized spending; clarify a material new commitment or missing budget before incurring it.
+- Bound expensive public operations, retries, concurrency, and work size as needed.
+- Distinguish billing alerts from enforced limits; prepare safe code or a disabled/sandbox integration while spending authorization is unresolved.
+
+## 12. Route model/reasoning and context efficiently
 
 Read `references/model-routing.md` when the host supports model selection, reasoning levels, subagents, or when the task is consuming excessive context.
 
@@ -242,7 +262,7 @@ Escalate for:
 
 If model routing is unavailable, adapt the *depth of analysis and context* instead of nagging the user about models.
 
-## 12. Stop conditions
+## 13. Stop conditions
 
 Pause before the dangerous action and surface a blocker when any of these is true and cannot be safely resolved within the task:
 
@@ -253,11 +273,13 @@ Pause before the dangerous action and surface a blocker when any of these is tru
 - untrusted input reaches arbitrary command/code/query execution without proper controls;
 - payment/balance/value-transfer logic can duplicate or lose value due to missing idempotency/transactional protection;
 - production access/security controls would need to be broadly disabled to proceed;
+- a test/startup command would cause unapproved live mutations, charges, or messages;
+- a material external action or spending commitment exceeds established authorization;
 - user work would need to be discarded or history rewritten without explicit consent.
 
 Do not stop merely because a safer implementation takes a little longer. Implement the safe version when it is straightforward.
 
-## 13. User-facing communication: quiet mode by default
+## 14. User-facing communication: quiet mode by default
 
 Do routine engineering work silently. Do not dump a checklist after every request.
 
@@ -278,6 +300,7 @@ Deployment: <not deployed / deployed + smoke check>
 ```
 
 Never claim tests, backups, security scans, builds, or deployments ran if they did not.
+For behavior spanning components, state whether the acceptance scenario was verified in the connected application or only in isolation. Surface any unverified acceptance criterion that limits completion.
 
 When blocked, state:
 1. what is unsafe/unknown;
@@ -286,7 +309,7 @@ When blocked, state:
 
 Avoid teaching terminology unless the user asks. Prefer plain language first, precise term second if useful.
 
-## 14. Load references selectively
+## 15. Load references selectively
 
 Use progressive disclosure. Do not load every reference for every task.
 
@@ -298,15 +321,17 @@ Use progressive disclosure. Do not load every reference for every task.
 - Tests → `references/testing.md`
 - Maintainability/code quality → `references/maintainability.md`
 - Reliability/performance → `references/reliability.md`
-- Production/deployment → `references/deployment.md`
+- External actions/deployment → `references/deployment.md`
+- Operating costs and spending limits → `references/operating-costs.md`
 - Model/context cost → `references/model-routing.md`
 - Calibration examples → `references/examples.md`
 
-## 15. Final sanity check
+## 16. Final sanity check
 
 Before declaring a non-trivial task complete, ask internally:
 
 - Did I solve the requested problem rather than an adjacent one?
+- Did I verify the acceptance criteria, including a connected application scenario when needed, or clearly identify what remains unverified?
 - Did I preserve unrelated user work?
 - Is the change proportionate, or did I over-engineer it?
 - Did I introduce a security regression?
@@ -315,6 +340,7 @@ Before declaring a non-trivial task complete, ask internally:
 - If persistent data can be lost, is recovery credible?
 - Did I add an unnecessary dependency?
 - Did I use excessive model/context resources for a simple task?
+- Are material external actions and operating costs within the authorized scope and limits?
 - Did I truthfully report what was and was not verified?
 
 If all material checks pass, finish without extra ceremony.

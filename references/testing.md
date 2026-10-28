@@ -2,6 +2,24 @@
 
 Testing should prove the changed behavior, not maximize test count.
 
+## Safe execution targets
+
+Before tests, seed/reset scripts, or application startup, inspect the command, lifecycle hooks, migrations, and enabled background jobs for side effects.
+
+For commands that can reach persistent state or external services:
+- resolve the actual database/storage and external-service account/environment without printing credential values;
+- use an isolated test database/data set and provider sandbox/test credentials; disable live payments, outgoing messages, and unrelated jobs;
+- verify the target rather than trusting a filename, localhost, or an environment variable named `test`;
+- keep destructive fixtures/reset scripts away from shared or production data.
+
+If isolation is unknown, prepare a safe local/test setup and run checks that cannot touch live state. Report unavailable integration checks. Do not run against production merely because it is the only configured environment; a deliberate live verification needs specific authorization, bounded effects, and applicable recovery checks from `deployment.md` and `data-and-backups.md`.
+
+## Acceptance criteria first
+
+For new or changed behavior, derive short acceptance criteria from user actions and observable outcomes before choosing tests. Reuse the user's explicit requirements and fill obvious details with safe conventional assumptions; ask only about ambiguities that materially change the product.
+
+For “save a request,” useful criteria might be: a valid request is saved, a fresh read/reload returns it, unauthorized users cannot access it when access is restricted, and a save failure is visible. Tests should establish the relevant outcomes, not simply agree with the code that was generated.
+
 ## When tests are expected
 
 Usually add/update tests for:
@@ -82,6 +100,14 @@ Prefer fast feedback first:
 
 Do not run a 30-minute full suite for a trivial isolated change unless required by the project workflow.
 
+## Connected application verification
+
+When behavior crosses UI/API/storage or an external integration boundary, verify at least one target acceptance scenario through the real connected application in a safe environment. Start it when needed and verify actual wiring, rather than relying only on mocks or a successful build.
+
+For persistence, perform a fresh read/reload; include restart verification when durability across restarts is part of the contract. For UI behavior, interact with the relevant control; manual checks or focused existing tooling can be sufficient without creating a new browser-automation suite. Use provider sandboxes for external effects.
+
+If the environment is unavailable, state separately what was implemented, what passed isolated checks, and which acceptance criteria remain unverified in the application. Do not present a stubbed API or mocked provider as a completed real integration unless that prototype scope was explicitly requested.
+
 ## Database/integration tests
 
 For data-sensitive logic, test important invariants rather than only mocked repository calls.
@@ -100,3 +126,5 @@ Only report tests/checks that actually ran. Distinguish:
 - failed;
 - not run;
 - unavailable in the environment.
+
+Distinguish implementation status, isolated test results, and verification through the connected application. A limitation affecting an acceptance criterion belongs in the completion report, even when the build and unit tests pass.

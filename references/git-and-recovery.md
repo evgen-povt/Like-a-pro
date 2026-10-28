@@ -6,10 +6,23 @@ Git is the default safety net for source changes. It is not a substitute for bac
 
 If creating a software project and Git is available:
 - initialize a local repository unless the user opted out;
-- create an appropriate `.gitignore` before secrets/build artifacts appear;
+- create an appropriate `.gitignore` before staging files or generating/downloading local artifacts;
 - keep `.env` and credentials ignored;
 - provide `.env.example` with names/placeholders only when useful;
 - do not create or push a remote unless requested.
+
+## Ignore secrets and reproducible local files
+
+Adapt `.gitignore` to the actual stack. Normally exclude:
+- real `.env` variants, credentials, private keys, and local secret/config files;
+- installed/downloaded dependencies and virtual environments, such as `node_modules/` and `.venv/`;
+- reproducible build/package outputs, such as `dist/`, `build/`, and framework build directories;
+- caches, coverage output, logs, temporary files, and local runtime databases/dumps;
+- downloaded archives, datasets, or models that are reproducible and not intended source inputs.
+
+Keep placeholder-only configuration examples, required lockfiles, migrations, and intentional fixtures/assets or vendored inputs versioned. Do not blanket-ignore all generated/downloaded files: some are required deliverables or source inputs.
+
+Check representative paths with `git check-ignore` and inspect `git status`/`git ls-files` without printing secret contents. `.gitignore` does not untrack files already in the index or remove them from history. If an excluded file is already tracked, arrange a scoped index removal that preserves the local file and intended repository behavior; do not silently delete user files. Treat real credentials already committed as exposed and rotate them; history cleanup is a separate action.
 
 ## Existing repositories
 
@@ -25,15 +38,17 @@ If the working tree contains unrelated changes:
 
 ## Checkpoints
 
-Before a broad or risky refactor, ensure the previous state is recoverable.
+Before a broad or risky edit, identify which files can be changed and verify a recovery artifact covers their **current pre-edit state**:
+- the base revision;
+- staged and unstaged changes, preserving their distinction when needed;
+- required untracked source/assets;
+- any non-reproducible local state needed for recovery, using appropriate protected storage.
 
-Preferred methods, from least intrusive to more explicit:
-1. existing clean commit/reference;
-2. a focused local commit of changes created for the task;
-3. a patch/diff artifact when committing is inappropriate;
-4. a branch/checkpoint when the workflow already uses branches.
+Use an existing commit only when the affected files match it and no required untracked work is left uncovered. Otherwise use a focused task commit when appropriate, or a protected snapshot/patch set outside the files being changed that preserves user work without committing it. Check the artifact's coverage and understand the restore steps before proceeding.
 
-Do not silently commit unrelated user work just to create a checkpoint.
+A branch or tag alone records committed state, not uncommitted edits. A plain `git diff` omits staged changes and untracked files; a patch-based checkpoint must account for those separately and support binary files when needed. Do not include secrets in ordinary patches/commits or copy dependency/build caches as a substitute for identifying what needs recovery.
+
+Do not silently commit, stash, or rearrange unrelated user work just to create a checkpoint.
 
 ## Dangerous Git operations
 

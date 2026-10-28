@@ -9,7 +9,7 @@ Evaluate:
 1. **System criticality** — what the software already controls or stores.
 2. **Change risk** — what this specific change can break or expose.
 
-Use the higher level as the effective risk.
+Choose the effective level from the actual blast radius of the change and its execution/delivery steps. System criticality raises assurance for affected invariants; it does not automatically raise every edit to the system's criticality level.
 
 ## System criticality
 
@@ -76,9 +76,9 @@ Use the higher level as the effective risk.
 
 ## Effective response
 
-Use `max(C, R)` as a baseline, then lower or raise individual checks based on actual blast radius.
+Identify affected data, permissions, behavior, integrations, and delivery steps. Apply checks for those boundaries, with stronger evidence where the system's criticality makes failure more consequential. If that scope is unknown, inspect callers/configuration and execution targets before classifying.
 
-Do not mechanically require all Level 3 procedures because a project is generally critical. A CSS color change in a bank dashboard is still a trivial change if it cannot affect behavior or security.
+An isolated CSS color change in a bank dashboard is Level 0 when it cannot affect behavior or security and no risky delivery step is included. A production infrastructure replacement to ship that same edit needs its own Level 3 checks. Do not require unrelated security, backup, or architecture procedures for the cosmetic edit itself.
 
 Likewise, a one-line authorization change in a small app can be Level 2 or 3 because small diff size does not mean small risk.
 
