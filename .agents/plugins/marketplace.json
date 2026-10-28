@@ -1,0 +1,20 @@
+{
+  "name": "like-a-pro",
+  "interface": {
+    "displayName": "Like a pro"
+  },
+  "plugins": [
+    {
+      "name": "like-a-pro",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

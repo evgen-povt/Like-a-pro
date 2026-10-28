@@ -1,0 +1,4 @@
+interface:
+  display_name: "Like a pro"
+  short_description: "Practical engineering guardrails for your projects"
+  default_prompt: "Use $like-a-pro to help me build and deliver this project."

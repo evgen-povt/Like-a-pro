@@ -1,0 +1,30 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "like-a-pro",
+  "version": "0.1.0",
+  "description": "Practical engineering guardrails for AI-assisted software projects.",
+  "author": {
+    "name": "Evgenii Valeev",
+    "url": "https://github.com/evgen-povt"
+  },
+  "homepage": "https://github.com/evgen-povt/like-a-pro",
+  "repository": "https://github.com/evgen-povt/like-a-pro",
+  "license": "MIT",
+  "keywords": ["software-development", "engineering", "guardrails", "vibe-coding"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Like a pro",
+        "shortDescription": "Practical engineering guardrails for your projects",
+        "longDescription": "Build, change, test, and deliver software with engineering checks proportional to the risk. Covers recovery, security, privacy, testing, hosting costs, critical-change review, and project handover.",
+        "developerName": "Evgenii Valeev",
+        "websiteURL": "https://github.com/evgen-povt/like-a-pro",
+        "supportURL": "https://github.com/evgen-povt/like-a-pro/issues",
+        "category": "Productivity",
+        "defaultPrompt": [
+          "Use Like a pro to help me build and deliver this project."
+        ]
+      }
+    }
+  }
+}

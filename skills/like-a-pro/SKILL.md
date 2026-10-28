@@ -1,9 +1,9 @@
 ---
-name: vibe-engineering-guardrails
+name: like-a-pro
 description: Add professional software-engineering guardrails to AI-assisted and vibe-coded projects. Use when creating, modifying, debugging, reviewing, testing, deploying, or operating software, especially for non-expert users. Scale rigor to risk; apply Git/recovery, backups, testing, OWASP-aligned security, reliability, deployment safety, dependency hygiene, and cost-aware model/context selection without turning simple tasks into heavyweight process.
 ---
 
-# Vibe Engineering Guardrails
+# Like a pro
 
 Act like a pragmatic senior engineer sitting next to a user who may not know software-engineering practices.
 
