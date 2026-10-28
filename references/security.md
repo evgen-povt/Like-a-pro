@@ -97,6 +97,18 @@ When authentication uses ambient cookies and a state-changing request is possibl
 - Treat a secret exposed to source history, logs, or an untrusted system as compromised; rotate it.
 - Do not design custom cryptography for ordinary application needs.
 
+## Personal data lifecycle
+
+When a feature collects or processes personal data:
+- identify the purpose and minimum fields needed; do not add sensitive fields merely because a template or convenient data source includes them;
+- use synthetic fixtures by default; properly de-identify necessary representative data and check free text, indirect identifiers, and linked records rather than merely changing names;
+- keep real customer data out of public previews, ordinary test fixtures, screenshots, telemetry, and third-party tools unless specifically authorized with appropriate controls;
+- determine who can access/export data and what is exposed to providers or analytics; use the minimum necessary access and disclosure;
+- define relevant retention and deletion/anonymization behavior, including connected records, uploads, external copies, and any backup/audit retention constraints;
+- when a material retention/deletion choice is missing, present a concrete minimal proposal and clarify the product decision rather than inventing a period or silently retaining everything forever.
+
+Follow supplied privacy/consent/retention requirements. Flag a concrete unresolved legal requirement for qualified review instead of inventing jurisdiction-specific obligations or claiming legal compliance. Keep these checks proportional to the data and feature; do not turn an unrelated edit into a privacy programme.
+
 ## Server-side outbound requests / SSRF
 
 If user input influences a URL/host:
@@ -184,6 +196,16 @@ Avoid:
 - long-lived broad cloud credentials in code;
 - disabling TLS verification;
 - plaintext secrets in images/build logs.
+
+## Independent review of critical changes
+
+Before releasing material changes to authorization, tenant isolation, security boundaries, or money/value-transfer invariants, obtain a focused review independent of the implementer's own reasoning. Use a suitably capable fresh-context reviewer or qualified human, with expertise appropriate to the consequences. An automated scan can support the review but is not evidence of complete coverage.
+
+Give the reviewer the actual patch/revision, relevant source and requirements, affected invariants, and verification evidence. Let them inspect the underlying evidence rather than relying on the implementer's conclusion that the change is safe. Scope the review to the changed behavior and integration boundaries; do not demand a repository-wide audit for a small patch.
+
+Verify actionable findings against primary evidence, resolve material defects, and rerun affected checks. Do not treat an implementer's self-review, a stronger model used by the same implementation pass, or a passing test suite as independent review. Use only authorized local/tools access; do not upload private code/data to an external reviewer or service without authorization.
+
+If the necessary reviewer is unavailable, continue safe implementation, testing, and release preparation, disclose the missing review, and keep the affected high-risk release pending. If the consequences require qualified human/domain review, do not silently substitute model confidence for it. Existing authorization to release should not be requested again once the required review and checks are satisfied.
 
 ## Security completion test
 

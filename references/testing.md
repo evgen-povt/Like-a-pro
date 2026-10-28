@@ -119,6 +119,17 @@ Examples:
 - concurrent update protection when relevant;
 - migration transform on representative fixtures.
 
+## Basic UI usability checks
+
+For new UI flows or changes to layout/interaction, exercise the affected user flow in a safe environment and check:
+- a narrow/mobile and a normal viewport for usable layout, readable content, and reachable controls;
+- keyboard access, logical focus order, visible focus, and usable dialog focus/escape behavior where relevant;
+- semantic controls and accessible names, with field labels and errors associated with the right input;
+- relevant loading, error, empty, and success states, including preserved input on failure and protection from duplicate submission;
+- feedback that communicates state without relying on color alone.
+
+Reuse native controls, established components, and available tooling. Focused manual checks can be sufficient; report what was actually checked. Do not create a new design system, require every possible state for an unrelated cosmetic edit, or claim accessibility certification from a brief smoke check. Use synthetic data in screenshots and previews.
+
 ## Reporting
 
 Only report tests/checks that actually ran. Distinguish:

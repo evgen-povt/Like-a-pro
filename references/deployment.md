@@ -31,6 +31,7 @@ Scale to risk, but consider:
 - required environment variables/secrets exist without printing secret values;
 - configuration points to the intended environment;
 - dependency/lockfile changes are expected;
+- focused independent review is complete for material security/authorization/value-transfer changes, as described in `security.md`;
 - rollback/recovery is understood for high-risk changes.
 
 ## Database + application compatibility

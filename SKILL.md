@@ -83,6 +83,8 @@ Before non-trivial edits:
 
 For large repositories, start narrow and expand context only when evidence requires it.
 
+For a new/shared project, substantial setup changes, or handover, read `references/project-bootstrap.md`. Keep enough non-secret run/setup and ownership information in the project for another person or chat to continue without relying on conversation history.
+
 ## 3. Plan proportionally
 
 For Level 0, edit directly.
@@ -151,31 +153,17 @@ For reliability-sensitive work, read `references/reliability.md`.
 Security is risk-driven, not a giant checklist applied to every change.
 
 Read `references/security.md` when the change involves any of:
-- authentication or authorization;
-- untrusted input;
-- browser/server trust boundaries;
-- secrets or credentials;
-- file upload/download;
-- URLs or server-side outbound requests;
-- SQL/NoSQL queries or command execution;
-- webhooks;
-- tokens/sessions/cookies;
-- payments, balances, privileged operations;
-- dependencies or build/release supply chain;
-- production infrastructure.
+- identity, permissions, personal data, or secrets;
+- untrusted input, files, URLs, browser/server boundaries, queries, or code execution;
+- sessions, webhooks, payments, privileged operations, supply chain, or production infrastructure.
 
 Use OWASP Top 10 / ASVS concepts as guidance, not as a claim of certification.
 
-Never silently “fix” a problem by broadly weakening:
-- authentication or authorization;
-- TLS/certificate verification;
-- CORS;
-- CSRF protection;
-- IAM/ACLs;
-- firewall/security groups;
-- input validation;
-- sandboxing;
-- signature verification.
+Never silently solve a problem by broadly weakening authentication/authorization, TLS verification, CORS/CSRF defenses, IAM/ACLs, network controls, input validation, sandboxing, or signature verification.
+
+For personal data, minimize collection and exposure, use synthetic or properly de-identified fixtures, and define relevant retention/deletion behavior. Do not invent legal requirements or claim compliance from these engineering checks.
+
+Before release of material authorization, tenant-isolation, security-boundary, or value-transfer changes, arrange focused independent review as described in `references/security.md`. A stronger model or the implementer's self-review alone is not independent review. Keep the review proportional to the affected invariants.
 
 ## 8. Test the changed behavior
 
@@ -183,23 +171,13 @@ Read `references/testing.md` for Level 1+ behavior changes and all bug fixes.
 
 Before tests, seed/reset scripts, or starting the application, inspect invoked scripts/hooks for side effects. For commands that can reach persistent state or external services, resolve the actual targets without printing credentials and use isolated test data and sandbox/test credentials. Do not assume a local command or a variable named `test` makes it safe. If isolation cannot be confirmed, run safe checks and report the limitation instead of running destructive fixtures or live payments/messages.
 
-Use the smallest useful test set. Typical order:
-1. targeted unit/integration test;
-2. relevant typecheck/static analysis;
-3. relevant lint;
-4. build/package check;
-5. broader suite only when warranted.
-
-For a bug fix, when practical:
-1. reproduce the bug;
-2. add or identify a test that fails for the bug;
-3. fix it;
-4. confirm the test passes;
-5. run nearby regression checks.
+Use the smallest meaningful test set, starting with targeted behavioral checks and adding static/build or broader checks as warranted. For a bug fix, reproduce it safely when practical, confirm a test fails for the expected reason, apply the fix, and verify it plus nearby regressions. Detailed check ordering is in `references/testing.md`.
 
 Do not edit tests merely to make a broken implementation pass. If intended behavior changes, update tests deliberately and explain the changed contract when material.
 
 When a change spans UI/API/storage or another integration boundary, verify at least one acceptance scenario through the real connected application in a safe environment. For persistence, check a fresh read/reload as appropriate. Mocks and a passing build alone do not establish that the feature works in the application. If unavailable, distinguish implementation, isolated checks, and application verification in the result. Do not require browser automation for every small edit.
+
+For new UI flows or changes to layout/interaction, check the affected flow at a narrow and normal viewport, keyboard operation, accessible field/control names, and relevant loading/error/empty/success states. For isolated cosmetic edits, check only the affected appearance/readability. Reuse existing tools and components; do not introduce an unrelated design system or full UI audit.
 
 ## 9. Treat dependencies as code you inherit
 
@@ -240,25 +218,7 @@ Read `references/operating-costs.md` before introducing or materially expanding 
 
 Read `references/model-routing.md` when the host supports model selection, reasoning levels, subagents, or when the task is consuming excessive context.
 
-Principle: **use the least expensive capability that can reliably solve the task, then escalate on evidence.**
-
-Do not spend a top reasoning model on:
-- styling;
-- formatting;
-- renames;
-- obvious repetitive edits;
-- simple boilerplate.
-
-Escalate for:
-- architecture;
-- security-sensitive logic;
-- authentication/authorization;
-- money/accounting/crypto;
-- destructive or complex migrations;
-- concurrency/distributed systems;
-- difficult debugging after a reasonable first attempt;
-- performance analysis requiring non-trivial reasoning;
-- unfamiliar/ambiguous code where a wrong assumption is costly.
+Use the least expensive capability that can reliably solve the task, then escalate on evidence. Keep cosmetic/mechanical edits lightweight; use stronger reasoning for costly ambiguity, sensitive boundaries, complex consistency/migrations, or debugging that a reasonable initial attempt did not explain. Detailed tiers and escalation signals are in the reference.
 
 If model routing is unavailable, adapt the *depth of analysis and context* instead of nagging the user about models.
 
@@ -302,6 +262,8 @@ Deployment: <not deployed / deployed + smoke check>
 Never claim tests, backups, security scans, builds, or deployments ran if they did not.
 For behavior spanning components, state whether the acceptance scenario was verified in the connected application or only in isolation. Surface any unverified acceptance criterion that limits completion.
 
+For substantial project delivery or handover, update existing run/setup notes with the current environment, verified scenarios, recovery pointers, and remaining limitations. Record service/account ownership and required access without credentials; distinguish access verified from assumed. Do not create a new handoff document for every small edit.
+
 When blocked, state:
 1. what is unsafe/unknown;
 2. what consequence it creates;
@@ -313,18 +275,20 @@ Avoid teaching terminology unless the user asks. Prefer plain language first, pr
 
 Use progressive disclosure. Do not load every reference for every task.
 
-- Project setup → `references/project-bootstrap.md`
+- Project setup, ownership, and handover → `references/project-bootstrap.md`
 - Risk classification → `references/risk-model.md`
 - Git/recovery → `references/git-and-recovery.md`
 - Persistent data/backups → `references/data-and-backups.md`
-- Security → `references/security.md`
-- Tests → `references/testing.md`
+- Security, privacy, and independent critical-change review → `references/security.md`
+- Tests and affected UI usability → `references/testing.md`
 - Maintainability/code quality → `references/maintainability.md`
 - Reliability/performance → `references/reliability.md`
 - External actions/deployment → `references/deployment.md`
 - Operating costs and spending limits → `references/operating-costs.md`
 - Model/context cost → `references/model-routing.md`
 - Calibration examples → `references/examples.md`
+
+When maintaining this skill itself, use `references/skill-validation.md` for behavioral checks. This is not an extra step for ordinary application tasks.
 
 ## 16. Final sanity check
 
@@ -335,12 +299,14 @@ Before declaring a non-trivial task complete, ask internally:
 - Did I preserve unrelated user work?
 - Is the change proportionate, or did I over-engineer it?
 - Did I introduce a security regression?
+- Did I address the relevant personal-data lifecycle and obtain required independent review for critical logic?
 - Did behavior changes get an appropriate test/check?
 - Can risky changes be rolled back?
 - If persistent data can be lost, is recovery credible?
 - Did I add an unnecessary dependency?
 - Did I use excessive model/context resources for a simple task?
 - Are material external actions and operating costs within the authorized scope and limits?
+- For substantial delivery, can the owner or a fresh chat continue from the project's documented setup and verified access?
 - Did I truthfully report what was and was not verified?
 
 If all material checks pass, finish without extra ceremony.
